@@ -1,0 +1,35 @@
+name: Build APK from PWA
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install PWABuilder CLI
+        run: npm install -g @pwabuilder/cli
+
+      - name: Build APK
+        run: |
+          pwabuilder apk \
+            --manifest ./manifest.json \
+            --output ./app.apk \
+            --signing-mode none
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: water-manager-apk
+          path: ./app.apk
