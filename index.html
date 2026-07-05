@@ -1,0 +1,1307 @@
+﻿<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <link rel="manifest" href="manifest.json">
+	<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+	<title>دفتر حساب آب</title>
+    <style>
+        /* ============================================= */
+        /* تمام استایل‌ها در همینجا قرار دارند             */
+        /* ============================================= */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Tahoma', 'Segoe UI', Arial, sans-serif;
+            background-color: #ffffff;
+            color: #2c3e50;
+            direction: rtl;
+            text-align: right;
+            max-width: 500px;
+            margin: 0 auto;
+            min-height: 100vh;
+            overflow-x: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        }
+
+        .page {
+            display: none;
+            min-height: 100vh;
+            padding-bottom: 30px;
+        }
+
+        .page.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .splash-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 30px 20px;
+            background: linear-gradient(160deg, #e6f2ff 0%, #ffffff 100%);
+        }
+
+        .app-title {
+            font-size: 32px;
+            font-weight: bold;
+            color: #1a5276;
+            margin-bottom: 8px;
+        }
+
+        .app-subtitle {
+            font-size: 16px;
+            color: #5b7f9b;
+            margin-bottom: 50px;
+        }
+
+        .main-buttons {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .main-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 28px 20px;
+            border: none;
+            border-radius: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+            color: white;
+        }
+
+        .main-btn .btn-icon {
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
+
+        .main-btn small {
+            font-size: 13px;
+            font-weight: normal;
+            opacity: 0.9;
+            margin-top: 6px;
+        }
+
+        .supplier-btn {
+            background: linear-gradient(135deg, #3498db, #2471a3);
+        }
+
+        .customer-btn {
+            background: linear-gradient(135deg, #2ecc71, #1e8449);
+        }
+
+        .main-btn:active {
+            transform: scale(0.96);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+        }
+
+        .header {
+            background-color: #ebf5fb;
+            padding: 16px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #d4e6f1;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header h2 {
+            font-size: 18px;
+            color: #1a5276;
+            margin: 0;
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        .back-btn {
+            background-color: #ffffff;
+            border: 1px solid #bdc3c7;
+            padding: 8px 14px;
+            border-radius: 12px;
+            font-size: 15px;
+            cursor: pointer;
+            color: #2c3e50;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .back-btn:active {
+            background-color: #ecf0f1;
+        }
+
+        .dashboard-content,
+        .detail-actions {
+            padding: 25px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 18px;
+            background-color: #ffffff;
+            border: 2px solid #d5dbdb;
+            border-radius: 16px;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            color: #2c3e50;
+            transition: all 0.25s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+        }
+
+        .action-btn:active {
+            background-color: #eaf2f8;
+            border-color: #3498db;
+            transform: scale(0.98);
+        }
+
+        .delete-btn {
+            background-color: #fdedec;
+            border-color: #e6b0aa;
+            color: #c0392b;
+        }
+
+        .data-form {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .data-form label {
+            font-size: 15px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: -10px;
+            margin-top: 5px;
+        }
+
+        .data-form input,
+        .data-form textarea,
+        .data-form select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #d5dbdb;
+            border-radius: 14px;
+            font-size: 16px;
+            font-family: inherit;
+            background-color: #fafafa;
+            transition: border 0.2s;
+        }
+
+        .data-form input:focus,
+        .data-form textarea:focus,
+        .data-form select:focus {
+            border-color: #3498db;
+            outline: none;
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 16px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.2s;
+        }
+
+        .submit-btn:active {
+            transform: scale(0.97);
+            opacity: 0.9;
+        }
+
+        .search-bar {
+            margin: 15px 20px;
+            width: calc(100% - 40px);
+            padding: 14px 18px;
+            border: 2px solid #d5dbdb;
+            border-radius: 30px;
+            font-size: 16px;
+            background-color: #fafafa;
+        }
+
+        .search-bar:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        .list-container {
+            padding: 0 20px 20px;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: #ffffff;
+            width: 90%;
+            max-width: 450px;
+            max-height: 85vh;
+            overflow-y: auto;
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            animation: fadeIn 0.2s ease;
+        }
+
+        .modal-content h3 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #1a5276;
+            font-size: 20px;
+        }
+
+        .modal-content .data-form {
+            padding: 0;
+        }
+
+        .supplier-card, .customer-card {
+            background-color: #ffffff;
+            border: 1px solid #e0e6ed;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .supplier-card:active, .customer-card:active {
+            background-color: #f4f9ff;
+            transform: scale(0.99);
+        }
+
+        .card-info h4 {
+            font-size: 17px;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .card-info p {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+
+        .card-arrow {
+            font-size: 20px;
+            color: #bdc3c7;
+        }
+
+        .no-data {
+            text-align: center;
+            color: #95a5a6;
+            padding: 40px 20px;
+            font-size: 16px;
+        }
+
+        @media (max-width: 400px) {
+            .app-title { font-size: 26px; }
+            .main-btn { font-size: 18px; padding: 22px 15px; }
+            .header h2 { font-size: 16px; }
+        }
+    .backup-section {
+    width: 100%;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 30px;
+}
+
+.backup-btn {
+    width: 100%;
+    padding: 14px;
+    background-color: #f8f9fa;
+    border: 2px dashed #b0bec5;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #455a64;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.backup-btn:active {
+    background-color: #e9ecef;
+    border-color: #78909c;
+}
+	/* ============================================= */
+/* کارت‌های خلاصه مالی در صفحه اصلی               */
+/* ============================================= */
+.summary-cards {
+    width: 100%;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.summary-card {
+    border-radius: 20px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.04);
+    transition: all 0.2s;
+}
+
+.debit-card {
+    background: linear-gradient(135deg, #fff5f5, #ffeaea);
+    border: 1px solid #f5c6cb;
+}
+
+.credit-card {
+    background: linear-gradient(135deg, #f0f7ff, #e6f2ff);
+    border: 1px solid #b3d9ff;
+}
+
+.summary-label {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.debit-card .summary-label {
+    color: #a94442;
+}
+
+.credit-card .summary-label {
+    color: #1a5276;
+}
+
+.summary-value {
+    font-size: 28px;
+    font-weight: bold;
+    margin: 8px 0;
+}
+
+.debit-card .summary-value {
+    color: #c0392b;
+}
+
+.credit-card .summary-value {
+    color: #2471a3;
+}
+
+.summary-card small {
+    font-size: 12px;
+    color: #7f8c8d;
+}
+	</style>
+</head>
+<body>
+
+    <!-- صفحه اصلی (Splash Screen) -->
+    <div id="main-page" class="page active">
+        <div class="splash-container">
+            <h1 class="app-title">💧 دفتر حساب آب</h1>
+            <p class="app-subtitle">مدیریت ساده حساب‌ها</p>
+            <div class="main-buttons">
+                <button class="main-btn supplier-btn" onclick="navigateTo('supplier-dashboard')">
+                    <span class="btn-icon">🚚</span>
+                    <span>ورود به پنل تأمین‌کنندگان</span>
+                    <small>بستانکاران</small>
+                </button>
+                <button class="main-btn customer-btn" onclick="navigateTo('customer-dashboard')">
+                    <span class="btn-icon">👥</span>
+                    <span>ورود به پنل مشتریان</span>
+                    <small>بدهکاران</small>
+                </button>
+            </div>
+        </div>
+    </div>
+	<!-- کارت‌های خلاصه مالی -->
+<div class="summary-cards">
+    <div class="summary-card debit-card">
+        <div class="summary-label">📥 کل بدهکاری مشتریان</div>
+        <div class="summary-value" id="total-customer-debit">-- تومان</div>
+        <small>مبلغی که باید دریافت کنید</small>
+    </div>
+    <div class="summary-card credit-card">
+        <div class="summary-label">📤 کل بدهی به تأمین‌کنندگان</div>
+        <div class="summary-value" id="total-supplier-credit">-- تومان</div>
+        <small>مبلغی که باید پرداخت کنید</small>
+    </div>
+</div>
+	<div class="backup-section">
+    <h3 style="margin: 30px 0 10px; color: #5b7f9b;">⚙️ تنظیمات و پشتیبان‌گیری</h3>
+    <button class="backup-btn" onclick="exportAllData()">📥 دریافت فایل پشتیبان</button>
+    <button class="backup-btn" onclick="document.getElementById('restore-file-input').click()">📤 بازیابی از فایل پشتیبان</button>
+    <input type="file" id="restore-file-input" accept=".json" style="display: none;" onchange="importAllData(event)">
+</div>
+
+    <!-- پنل تأمین‌کنندگان: داشبورد -->
+    <div id="supplier-dashboard" class="page">
+        <div class="header">
+            <button class="back-btn" onclick="navigateTo('main-page')">⬅️ بازگشت</button>
+            <h2>پنل تأمین‌کنندگان</h2>
+            <div></div>
+        </div>
+        <div class="dashboard-content">
+            <button class="action-btn" onclick="navigateTo('add-supplier')">➕ افزودن تأمین‌کننده جدید</button>
+            <button class="action-btn" onclick="navigateTo('supplier-list')">📋 مشاهده لیست تأمین‌کنندگان</button>
+        </div>
+    </div>
+
+    <!-- پنل تأمین‌کنندگان: افزودن/ویرایش -->
+    <div id="add-supplier" class="page">
+        <div class="header">
+            <button class="back-btn" onclick="navigateTo('supplier-dashboard')">⬅️ بازگشت</button>
+            <h2 id="supplier-form-title">افزودن تأمین‌کننده</h2>
+            <div></div>
+        </div>
+        <form id="supplier-form" class="data-form" onsubmit="return false;">
+            <input type="hidden" id="supplier-id">
+            <label for="supplier-name">نام و نام‌خانوادگی *</label>
+            <input type="text" id="supplier-name" placeholder="مثال: علی احمدی" required>
+            <label for="supplier-phone">شماره تماس *</label>
+            <input type="tel" id="supplier-phone" placeholder="مثال: 09123456789" required>
+            <label for="supplier-address">آدرس</label>
+            <textarea id="supplier-address" rows="2" placeholder="آدرس کامل"></textarea>
+            <label for="supplier-water-type">نوع آب</label>
+            <select id="supplier-water-type">
+                <option value="شیرین">شیرین</option>
+                <option value="نیمه‌شیرین">نیمه‌شیرین</option>
+                <option value="صنعتی">صنعتی</option>
+                <option value="سایر">سایر</option>
+            </select>
+            <label for="supplier-rate">مبلغ هر لیتر (تومان) *</label>
+            <input type="number" id="supplier-rate" placeholder="مثلاً 5000" min="0" required>
+            <button type="button" class="submit-btn" onclick="saveSupplier()">💾 ذخیره اطلاعات</button>
+        </form>
+    </div>
+
+    <!-- پنل تأمین‌کنندگان: لیست -->
+    <div id="supplier-list" class="page">
+        <div class="header">
+            <button class="back-btn" onclick="navigateTo('supplier-dashboard')">⬅️ بازگشت</button>
+            <h2>لیست تأمین‌کنندگان</h2>
+            <div></div>
+        </div>
+        <input type="text" id="supplier-search" class="search-bar" placeholder="🔍 جستجوی نام..." oninput="renderSupplierList()">
+        <div id="supplier-list-container" class="list-container"></div>
+    </div>
+
+    <!-- پنل تأمین‌کنندگان: جزئیات -->
+    <div id="supplier-detail" class="page">
+        <div class="header">
+            <button class="back-btn" onclick="navigateTo('supplier-list')">⬅️ بازگشت</button>
+            <h2 id="supplier-detail-name">جزئیات</h2>
+            <div></div>
+        </div>
+        <div class="detail-actions">
+            <button class="action-btn" onclick="editSupplier()">✏️ ویرایش اطلاعات</button>
+            <button class="action-btn" onclick="recordShipment()">🚛 ثبت بارگیری/برداشت</button>
+            <button class="action-btn" onclick="registerPayment()">💰 ثبت پرداخت</button>
+            <button class="action-btn" onclick="viewHistory()">📜 مشاهده تاریخچه</button>
+            <button class="action-btn delete-btn" onclick="deleteCurrentSupplier()">🗑️ حذف تأمین‌کننده</button>
+        </div>
+    </div>
+
+    <!-- پنل مشتریان: داشبورد -->
+    <div id="customer-dashboard" class="page">
+        <div class="header">
+            <button class="back-btn" onclick="navigateTo('main-page')">⬅️ بازگشت</button>
+            <h2>پنل مشتریان</h2>
+            <div></div>
+        </div>
+        <div class="dashboard-content">
+            <button class="action-btn" onclick="navigateTo('add-customer')">➕ افزودن مشتری جدید</button>
+            <button class="action-btn" onclick="navigateTo('customer-list')">📋 مشاهده لیست مشتریان</button>
+        </div>
+    </div>
+
+    <!-- پنل مشتریان: افزودن/ویرایش -->
+    <div id="add-customer" class="page">
+        <div class="header">
+            <button class="back-btn" onclick="navigateTo('customer-dashboard')">⬅️ بازگشت</button>
+            <h2 id="customer-form-title">افزودن مشتری</h2>
+            <div></div>
+        </div>
+        <form id="customer-form" class="data-form" onsubmit="return false;">
+            <input type="hidden" id="customer-id">
+            <label for="customer-name">نام و نام‌خانوادگی *</label>
+            <input type="text" id="customer-name" placeholder="مثال: شرکت ساختمانی البرز" required>
+            <label for="customer-phone">شماره تماس *</label>
+            <input type="tel" id="customer-phone" placeholder="مثال: 09123456789" required>
+            <label for="customer-address">آدرس</label>
+            <textarea id="customer-address" rows="2" placeholder="آدرس کامل"></textarea>
+            <label for="customer-water-type">نوع آب</label>
+            <select id="customer-water-type">
+                <option value="شیرین">شیرین</option>
+                <option value="نیمه‌شیرین">نیمه‌شیرین</option>
+                <option value="صنعتی">صنعتی</option>
+                <option value="سایر">سایر</option>
+            </select>
+            <label for="customer-rate">مبلغ هر لیتر (تومان) *</label>
+            <input type="number" id="customer-rate" placeholder="مثلاً 7000" min="0" required>
+            <button type="button" class="submit-btn" onclick="saveCustomer()">💾 ذخیره اطلاعات</button>
+        </form>
+    </div>
+
+    <!-- پنل مشتریان: لیست -->
+    <div id="customer-list" class="page">
+        <div class="header">
+            <button class="back-btn" onclick="navigateTo('customer-dashboard')">⬅️ بازگشت</button>
+            <h2>لیست مشتریان</h2>
+            <div></div>
+        </div>
+        <input type="text" id="customer-search" class="search-bar" placeholder="🔍 جستجوی نام..." oninput="renderCustomerList()">
+        <div id="customer-list-container" class="list-container"></div>
+    </div>
+
+    <!-- پنل مشتریان: جزئیات -->
+    <div id="customer-detail" class="page">
+        <div class="header">
+            <button class="back-btn" onclick="navigateTo('customer-list')">⬅️ بازگشت</button>
+            <h2 id="customer-detail-name">جزئیات</h2>
+            <div></div>
+        </div>
+        <div class="detail-actions">
+            <button class="action-btn" onclick="editCustomer()">✏️ ویرایش اطلاعات</button>
+            <button class="action-btn" onclick="recordSale()">🧾 ثبت فروش/دریافت آب</button>
+            <button class="action-btn" onclick="registerCustomerPayment()">💰 ثبت پرداخت</button>
+            <button class="action-btn" onclick="viewCustomerHistory()">📜 مشاهده تاریخچه</button>
+            <button class="action-btn delete-btn" onclick="deleteCurrentCustomer()">🗑️ حذف مشتری</button>
+        </div>
+    </div>
+
+    <!-- مودال‌ها -->
+    <div id="modal-overlay" class="modal-overlay">
+        <div id="modal-content" class="modal-content"></div>
+    </div>
+
+    <script>
+    // =============================================
+    // ناوبری
+    // =============================================
+    function navigateTo(pageId) {
+        var allPages = document.querySelectorAll('.page');
+        allPages.forEach(function(page) {
+            page.classList.remove('active');
+        });
+        var targetPage = document.getElementById(pageId);
+        if (targetPage) {
+            targetPage.classList.add('active');
+            window.scrollTo(0, 0);
+            if (pageId === 'supplier-list') {
+                renderSupplierList();
+            } else if (pageId === 'customer-list') {
+                renderCustomerList();
+				} else if (pageId === 'main-page') {
+            updateDashboardSummary(); // <-- این خط اضافه شد
+            }
+        }
+    }
+
+    // =============================================
+    // کلیدهای ذخیره‌سازی
+    // =============================================
+    var SUPPLIERS_KEY = 'water_app_suppliers';
+    var CUSTOMERS_KEY = 'water_app_customers';
+
+    function getData(key) {
+        var rawData = localStorage.getItem(key);
+        if (rawData) {
+            try {
+                return JSON.parse(rawData);
+            } catch (e) {
+                console.error(e);
+                return [];
+            }
+        }
+        return [];
+    }
+
+    function saveData(key, data) {
+        localStorage.setItem(key, JSON.stringify(data));
+    }
+
+    // =============================================
+    // تأمین‌کنندگان
+    // =============================================
+    function saveSupplier() {
+        var idElem = document.getElementById('supplier-id');
+        var nameElem = document.getElementById('supplier-name');
+        var phoneElem = document.getElementById('supplier-phone');
+        var addressElem = document.getElementById('supplier-address');
+        var waterTypeElem = document.getElementById('supplier-water-type');
+        var rateElem = document.getElementById('supplier-rate');
+
+        if (!nameElem.value.trim() || !phoneElem.value.trim() || !rateElem.value) {
+            alert('لطفا فیلدهای نام، شماره تماس و مبلغ هر لیتر را پر کنید.');
+            return;
+        }
+
+        var suppliers = getData(SUPPLIERS_KEY);
+        var now = new Date().toISOString();
+        var supplierData = {
+            id: idElem.value || Date.now().toString(),
+            name: nameElem.value.trim(),
+            phone: phoneElem.value.trim(),
+            address: addressElem.value.trim(),
+            waterType: waterTypeElem.value,
+            rate: Number(rateElem.value),
+            shipments: [],
+            payments: [],
+            createdAt: now
+        };
+
+        if (idElem.value) {
+            var existing = suppliers.find(function(s) { return s.id === idElem.value; });
+            if (existing) {
+                supplierData.shipments = existing.shipments || [];
+                supplierData.payments = existing.payments || [];
+                supplierData.createdAt = existing.createdAt || now;
+            }
+            var index = suppliers.findIndex(function(s) { return s.id === idElem.value; });
+            if (index !== -1) suppliers[index] = supplierData;
+        } else {
+            suppliers.push(supplierData);
+        }
+
+        saveData(SUPPLIERS_KEY, suppliers);
+        clearSupplierForm();
+        alert('اطلاعات تأمین‌کننده با موفقیت ذخیره شد.');
+        navigateTo('supplier-dashboard');
+    }
+
+    function clearSupplierForm() {
+        document.getElementById('supplier-id').value = '';
+        document.getElementById('supplier-form').reset();
+        document.getElementById('supplier-form-title').textContent = 'افزودن تأمین‌کننده';
+    }
+
+    function renderSupplierList() {
+        var searchInput = document.getElementById('supplier-search');
+        var searchTerm = searchInput ? searchInput.value.trim().toLowerCase() : '';
+        var suppliers = getData(SUPPLIERS_KEY);
+        var container = document.getElementById('supplier-list-container');
+        if (!container) return;
+
+        var filtered = suppliers.filter(function(s) {
+            return s.name.toLowerCase().includes(searchTerm) || s.phone.includes(searchTerm);
+        });
+
+        if (filtered.length === 0) {
+            container.innerHTML = '<div class="no-data">هیچ تأمین‌کننده‌ای یافت نشد.</div>';
+            return;
+        }
+
+        var html = '';
+        filtered.forEach(function(s) {
+            html += '<div class="supplier-card" onclick="viewSupplierDetail(\'' + s.id + '\')">' +
+                '<div class="card-info">' +
+                '<h4>' + s.name + '</h4>' +
+                '<p>' + s.phone + ' | ' + s.waterType + ' | ' + s.rate + ' تومان/لیتر</p>' +
+                '</div>' +
+                '<div class="card-arrow">◀</div>' +
+                '</div>';
+        });
+        container.innerHTML = html;
+    }
+
+    function viewSupplierDetail(id) {
+        var suppliers = getData(SUPPLIERS_KEY);
+        var supplier = suppliers.find(function(s) { return s.id === id; });
+        if (!supplier) {
+            alert('تأمین‌کننده یافت نشد.');
+            return;
+        }
+        document.getElementById('supplier-detail-name').textContent = supplier.name;
+        localStorage.setItem('active_supplier_id', id);
+        navigateTo('supplier-detail');
+    }
+
+    function editSupplier() {
+        var id = localStorage.getItem('active_supplier_id');
+        var suppliers = getData(SUPPLIERS_KEY);
+        var supplier = suppliers.find(function(s) { return s.id === id; });
+        if (!supplier) return;
+
+        document.getElementById('supplier-id').value = supplier.id;
+        document.getElementById('supplier-name').value = supplier.name;
+        document.getElementById('supplier-phone').value = supplier.phone;
+        document.getElementById('supplier-address').value = supplier.address;
+        document.getElementById('supplier-water-type').value = supplier.waterType;
+        document.getElementById('supplier-rate').value = supplier.rate;
+        document.getElementById('supplier-form-title').textContent = 'ویرایش تأمین‌کننده';
+        navigateTo('add-supplier');
+    }
+
+    function deleteCurrentSupplier() {
+        if (!confirm('آیا مطمئن هستید که می‌خواهید این تأمین‌کننده و تمام اطلاعاتش حذف شود؟')) return;
+        var id = localStorage.getItem('active_supplier_id');
+        var suppliers = getData(SUPPLIERS_KEY);
+        suppliers = suppliers.filter(function(s) { return s.id !== id; });
+        saveData(SUPPLIERS_KEY, suppliers);
+        alert('تأمین‌کننده حذف شد.');
+        localStorage.removeItem('active_supplier_id');
+        navigateTo('supplier-list');
+    }
+
+    function recordShipment() {
+        var modalOverlay = document.getElementById('modal-overlay');
+        var modalContent = document.getElementById('modal-content');
+        modalContent.innerHTML = '<h3>ثبت بارگیری جدید</h3>' +
+            '<div class="data-form">' +
+            '<label for="shipment-liters">تعداد لیتر *</label>' +
+            '<input type="number" id="shipment-liters" placeholder="مثلا 5000" min="1" required>' +
+            '<label>تاریخ و ساعت</label>' +
+            '<input type="datetime-local" id="shipment-date" value="' + getCurrentDateTimeLocal() + '" readonly style="background-color:#f0f0f0;">' +
+            '<p style="text-align:center; font-weight:bold;" id="calculated-amount">مبلغ کل: -- تومان</p>' +
+            '<button class="submit-btn" onclick="submitShipment()">ثبت بارگیری</button>' +
+            '<button class="action-btn" style="margin-top:10px;" onclick="closeModal()">انصراف</button>' +
+            '</div>';
+        modalOverlay.classList.add('active');
+        document.getElementById('shipment-liters').addEventListener('input', updateShipmentAmount);
+    }
+
+    function updateShipmentAmount() {
+        var id = localStorage.getItem('active_supplier_id');
+        var suppliers = getData(SUPPLIERS_KEY);
+        var supplier = suppliers.find(function(s) { return s.id === id; });
+        var liters = Number(document.getElementById('shipment-liters').value) || 0;
+        var amount = liters * (supplier ? supplier.rate : 0);
+        document.getElementById('calculated-amount').textContent = 'مبلغ کل: ' + amount.toLocaleString() + ' تومان';
+    }
+
+    function submitShipment() {
+        var id = localStorage.getItem('active_supplier_id');
+        var liters = Number(document.getElementById('shipment-liters').value);
+        if (!liters || liters <= 0) {
+            alert('لطفا تعداد لیتر را درست وارد کنید.');
+            return;
+        }
+        var suppliers = getData(SUPPLIERS_KEY);
+        var idx = suppliers.findIndex(function(s) { return s.id === id; });
+        if (idx === -1) return;
+
+        var shipment = {
+            id: Date.now().toString(),
+            date: new Date().toISOString(),
+            liters: liters,
+            rate: suppliers[idx].rate,
+            totalAmount: liters * suppliers[idx].rate
+        };
+        suppliers[idx].shipments.push(shipment);
+        saveData(SUPPLIERS_KEY, suppliers);
+        alert('بارگیری ثبت شد.');
+        closeModal();
+    }
+
+    function registerPayment() {
+        var modalOverlay = document.getElementById('modal-overlay');
+        var modalContent = document.getElementById('modal-content');
+        modalContent.innerHTML = '<h3>ثبت پرداخت</h3>' +
+            '<div class="data-form">' +
+            '<label for="payment-amount">مبلغ پرداختی (تومان) *</label>' +
+            '<input type="number" id="payment-amount" placeholder="مثلا 2000000" min="1" required>' +
+            '<label>تاریخ و ساعت</label>' +
+            '<input type="datetime-local" id="payment-date" value="' + getCurrentDateTimeLocal() + '" readonly style="background-color:#f0f0f0;">' +
+            '<label for="payment-note">شرح (اختیاری)</label>' +
+            '<input type="text" id="payment-note" placeholder="مثلا پرداخت نقدی">' +
+            '<button class="submit-btn" onclick="submitPayment()">ثبت پرداخت</button>' +
+            '<button class="action-btn" style="margin-top:10px;" onclick="closeModal()">انصراف</button>' +
+            '</div>';
+        modalOverlay.classList.add('active');
+    }
+
+    function submitPayment() {
+        var id = localStorage.getItem('active_supplier_id');
+        var amount = Number(document.getElementById('payment-amount').value);
+        if (!amount || amount <= 0) {
+            alert('لطفا مبلغ را درست وارد کنید.');
+            return;
+        }
+        var suppliers = getData(SUPPLIERS_KEY);
+        var idx = suppliers.findIndex(function(s) { return s.id === id; });
+        if (idx === -1) return;
+
+        var payment = {
+            id: Date.now().toString(),
+            date: new Date().toISOString(),
+            amount: amount,
+            note: document.getElementById('payment-note').value.trim()
+        };
+        suppliers[idx].payments.push(payment);
+        saveData(SUPPLIERS_KEY, suppliers);
+        alert('پرداخت ثبت شد.');
+        closeModal();
+    }
+
+    function viewHistory() {
+        var id = localStorage.getItem('active_supplier_id');
+        var suppliers = getData(SUPPLIERS_KEY);
+        var supplier = suppliers.find(function(s) { return s.id === id; });
+        if (!supplier) return;
+
+        var modalOverlay = document.getElementById('modal-overlay');
+        var modalContent = document.getElementById('modal-content');
+        var totalShipments = supplier.shipments.reduce(function(sum, s) { return sum + s.totalAmount; }, 0);
+        var totalPayments = supplier.payments.reduce(function(sum, p) { return sum + p.amount; }, 0);
+        var balance = totalShipments - totalPayments;
+
+        var html = '<h3>تاریخچه ' + supplier.name + '</h3>';
+        html += '<h4>بارگیری‌ها:</h4>';
+        if (supplier.shipments.length === 0) {
+            html += '<p style="color:#7f8c8d;">بدون بارگیری</p>';
+        } else {
+            html += '<table style="width:100%; border-collapse:collapse; margin-bottom:15px;">' +
+                '<tr style="background:#ebf5fb;"><th>تاریخ</th><th>لیتر</th><th>مبلغ</th></tr>';
+            supplier.shipments.slice().reverse().forEach(function(s) {
+                html += '<tr style="border-bottom:1px solid #eee;">' +
+                    '<td>' + new Date(s.date).toLocaleString('fa-IR') + '</td>' +
+                    '<td>' + s.liters.toLocaleString() + '</td>' +
+                    '<td>' + s.totalAmount.toLocaleString() + '</td></tr>';
+            });
+            html += '</table>';
+        }
+
+        html += '<h4>پرداخت‌ها:</h4>';
+        if (supplier.payments.length === 0) {
+            html += '<p style="color:#7f8c8d;">بدون پرداخت</p>';
+        } else {
+            html += '<table style="width:100%; border-collapse:collapse; margin-bottom:15px;">' +
+                '<tr style="background:#ebf5fb;"><th>تاریخ</th><th>شرح</th><th>مبلغ</th></tr>';
+            supplier.payments.slice().reverse().forEach(function(p) {
+                html += '<tr style="border-bottom:1px solid #eee;">' +
+                    '<td>' + new Date(p.date).toLocaleString('fa-IR') + '</td>' +
+                    '<td>' + (p.note || '---') + '</td>' +
+                    '<td>' + p.amount.toLocaleString() + '</td></tr>';
+            });
+            html += '</table>';
+        }
+
+        var balanceColor = balance >= 0 ? '#27ae60' : '#c0392b';
+        html += '<div style="text-align:center; font-size:18px; font-weight:bold; margin:20px 0; padding:15px; background:#f4f9ff; border-radius:12px;">' +
+            'مانده حساب جاری: <span style="color:' + balanceColor + '; font-size:20px;">' + balance.toLocaleString() + ' تومان</span>' +
+            '<br><small>(' + (balance >= 0 ? 'بدهکار هستید' : 'بستانکار هستید') + ')</small></div>';
+        html += '<button class="action-btn" onclick="closeModal()">بستن</button>';
+
+        modalContent.innerHTML = html;
+        modalOverlay.classList.add('active');
+    }
+
+    // =============================================
+    // مشتریان (عیناً مشابه تأمین‌کنندگان)
+    // =============================================
+    function saveCustomer() {
+        var idElem = document.getElementById('customer-id');
+        var nameElem = document.getElementById('customer-name');
+        var phoneElem = document.getElementById('customer-phone');
+        var addressElem = document.getElementById('customer-address');
+        var waterTypeElem = document.getElementById('customer-water-type');
+        var rateElem = document.getElementById('customer-rate');
+
+        if (!nameElem.value.trim() || !phoneElem.value.trim() || !rateElem.value) {
+            alert('لطفا فیلدهای نام، شماره تماس و مبلغ هر لیتر را پر کنید.');
+            return;
+        }
+
+        var customers = getData(CUSTOMERS_KEY);
+        var now = new Date().toISOString();
+        var customerData = {
+            id: idElem.value || Date.now().toString(),
+            name: nameElem.value.trim(),
+            phone: phoneElem.value.trim(),
+            address: addressElem.value.trim(),
+            waterType: waterTypeElem.value,
+            rate: Number(rateElem.value),
+            sales: [],
+            payments: [],
+            createdAt: now
+        };
+
+        if (idElem.value) {
+            var existing = customers.find(function(c) { return c.id === idElem.value; });
+            if (existing) {
+                customerData.sales = existing.sales || [];
+                customerData.payments = existing.payments || [];
+                customerData.createdAt = existing.createdAt || now;
+            }
+            var index = customers.findIndex(function(c) { return c.id === idElem.value; });
+            if (index !== -1) customers[index] = customerData;
+        } else {
+            customers.push(customerData);
+        }
+
+        saveData(CUSTOMERS_KEY, customers);
+        clearCustomerForm();
+        alert('اطلاعات مشتری با موفقیت ذخیره شد.');
+        navigateTo('customer-dashboard');
+    }
+
+    function clearCustomerForm() {
+        document.getElementById('customer-id').value = '';
+        document.getElementById('customer-form').reset();
+        document.getElementById('customer-form-title').textContent = 'افزودن مشتری';
+    }
+
+    function renderCustomerList() {
+        var searchInput = document.getElementById('customer-search');
+        var searchTerm = searchInput ? searchInput.value.trim().toLowerCase() : '';
+        var customers = getData(CUSTOMERS_KEY);
+        var container = document.getElementById('customer-list-container');
+        if (!container) return;
+
+        var filtered = customers.filter(function(c) {
+            return c.name.toLowerCase().includes(searchTerm) || c.phone.includes(searchTerm);
+        });
+
+        if (filtered.length === 0) {
+            container.innerHTML = '<div class="no-data">هیچ مشتری‌ای یافت نشد.</div>';
+            return;
+        }
+
+        var html = '';
+        filtered.forEach(function(c) {
+            html += '<div class="customer-card" onclick="viewCustomerDetail(\'' + c.id + '\')">' +
+                '<div class="card-info">' +
+                '<h4>' + c.name + '</h4>' +
+                '<p>' + c.phone + ' | ' + c.waterType + ' | ' + c.rate + ' تومان/لیتر</p>' +
+                '</div>' +
+                '<div class="card-arrow">◀</div>' +
+                '</div>';
+        });
+        container.innerHTML = html;
+    }
+
+    function viewCustomerDetail(id) {
+        var customers = getData(CUSTOMERS_KEY);
+        var customer = customers.find(function(c) { return c.id === id; });
+        if (!customer) {
+            alert('مشتری یافت نشد.');
+            return;
+        }
+        document.getElementById('customer-detail-name').textContent = customer.name;
+        localStorage.setItem('active_customer_id', id);
+        navigateTo('customer-detail');
+    }
+
+    function editCustomer() {
+        var id = localStorage.getItem('active_customer_id');
+        var customers = getData(CUSTOMERS_KEY);
+        var customer = customers.find(function(c) { return c.id === id; });
+        if (!customer) return;
+
+        document.getElementById('customer-id').value = customer.id;
+        document.getElementById('customer-name').value = customer.name;
+        document.getElementById('customer-phone').value = customer.phone;
+        document.getElementById('customer-address').value = customer.address;
+        document.getElementById('customer-water-type').value = customer.waterType;
+        document.getElementById('customer-rate').value = customer.rate;
+        document.getElementById('customer-form-title').textContent = 'ویرایش مشتری';
+        navigateTo('add-customer');
+    }
+
+    function deleteCurrentCustomer() {
+        if (!confirm('آیا مطمئن هستید که می‌خواهید این مشتری و تمام اطلاعاتش حذف شود؟')) return;
+        var id = localStorage.getItem('active_customer_id');
+        var customers = getData(CUSTOMERS_KEY);
+        customers = customers.filter(function(c) { return c.id !== id; });
+        saveData(CUSTOMERS_KEY, customers);
+        alert('مشتری حذف شد.');
+        localStorage.removeItem('active_customer_id');
+        navigateTo('customer-list');
+    }
+
+    function recordSale() {
+        var modalOverlay = document.getElementById('modal-overlay');
+        var modalContent = document.getElementById('modal-content');
+        modalContent.innerHTML = '<h3>ثبت فروش/دریافت آب</h3>' +
+            '<div class="data-form">' +
+            '<label for="sale-liters">تعداد لیتر *</label>' +
+            '<input type="number" id="sale-liters" placeholder="مثلا 3000" min="1" required>' +
+            '<label>تاریخ و ساعت</label>' +
+            '<input type="datetime-local" id="sale-date" value="' + getCurrentDateTimeLocal() + '" readonly style="background-color:#f0f0f0;">' +
+            '<p style="text-align:center; font-weight:bold;" id="calculated-sale-amount">مبلغ کل: -- تومان</p>' +
+            '<button class="submit-btn" onclick="submitSale()">ثبت فروش</button>' +
+            '<button class="action-btn" style="margin-top:10px;" onclick="closeModal()">انصراف</button>' +
+            '</div>';
+        modalOverlay.classList.add('active');
+        document.getElementById('sale-liters').addEventListener('input', updateSaleAmount);
+
+    }
+
+    function updateSaleAmount() {
+        var id = localStorage.getItem('active_customer_id');
+        var customers = getData(CUSTOMERS_KEY);
+        var customer = customers.find(function(c) { return c.id === id; });
+        var liters = Number(document.getElementById('sale-liters').value) || 0;
+        var amount = liters * (customer ? customer.rate : 0);
+        document.getElementById('calculated-sale-amount').textContent = 'مبلغ کل: ' + amount.toLocaleString() + ' تومان';
+    }
+
+    function submitSale() {
+        var id = localStorage.getItem('active_customer_id');
+        var liters = Number(document.getElementById('sale-liters').value);
+        if (!liters || liters <= 0) {
+            alert('لطفا تعداد لیتر را درست وارد کنید.');
+            return;
+        }
+        var customers = getData(CUSTOMERS_KEY);
+        var idx = customers.findIndex(function(c) { return c.id === id; });
+        if (idx === -1) return;
+
+        var sale = {
+            id: Date.now().toString(),
+            date: new Date().toISOString(),
+            liters: liters,
+            rate: customers[idx].rate,
+            totalAmount: liters * customers[idx].rate
+        };
+        customers[idx].sales.push(sale);
+        saveData(CUSTOMERS_KEY, customers);
+        alert('فروش ثبت شد.');
+        closeModal();
+    }
+
+    function registerCustomerPayment() {
+        var modalOverlay = document.getElementById('modal-overlay');
+        var modalContent = document.getElementById('modal-content');
+        modalContent.innerHTML = '<h3>ثبت پرداخت از مشتری</h3>' +
+            '<div class="data-form">' +
+            '<label for="cust-payment-amount">مبلغ پرداختی (تومان) *</label>' +
+            '<input type="number" id="cust-payment-amount" placeholder="مثلا 1500000" min="1" required>' +
+            '<label>تاریخ و ساعت</label>' +
+            '<input type="datetime-local" id="cust-payment-date" value="' + getCurrentDateTimeLocal() + '" readonly style="background-color:#f0f0f0;">' +
+            '<label for="cust-payment-note">شرح (اختیاری)</label>' +
+            '<input type="text" id="cust-payment-note" placeholder="مثلا پرداخت نقدی">' +
+            '<button class="submit-btn" onclick="submitCustomerPayment()">ثبت پرداخت</button>' +
+            '<button class="action-btn" style="margin-top:10px;" onclick="closeModal()">انصراف</button>' +
+            '</div>';
+        modalOverlay.classList.add('active');
+    }
+
+    function submitCustomerPayment() {
+        var id = localStorage.getItem('active_customer_id');
+        var amount = Number(document.getElementById('cust-payment-amount').value);
+        if (!amount || amount <= 0) {
+            alert('لطفا مبلغ را درست وارد کنید.');
+            return;
+        }
+        var customers = getData(CUSTOMERS_KEY);
+        var idx = customers.findIndex(function(c) { return c.id === id; });
+        if (idx === -1) return;
+
+        var payment = {
+            id: Date.now().toString(),
+            date: new Date().toISOString(),
+            amount: amount,
+            note: document.getElementById('cust-payment-note').value.trim()
+        };
+        customers[idx].payments.push(payment);
+        saveData(CUSTOMERS_KEY, customers);
+        alert('پرداخت مشتری ثبت شد.');
+        closeModal();
+    }
+
+    function viewCustomerHistory() {
+        var id = localStorage.getItem('active_customer_id');
+        var customers = getData(CUSTOMERS_KEY);
+        var customer = customers.find(function(c) { return c.id === id; });
+        if (!customer) return;
+
+        var modalOverlay = document.getElementById('modal-overlay');
+        var modalContent = document.getElementById('modal-content');
+        var totalSales = customer.sales.reduce(function(sum, s) { return sum + s.totalAmount; }, 0);
+        var totalPayments = customer.payments.reduce(function(sum, p) { return sum + p.amount; }, 0);
+        var balance = totalSales - totalPayments; // بدهکاری مشتری
+
+        var html = '<h3>تاریخچه ' + customer.name + '</h3>';
+        html += '<h4>فروش/دریافت آب:</h4>';
+        if (customer.sales.length === 0) {
+            html += '<p style="color:#7f8c8d;">بدون فروش</p>';
+        } else {
+            html += '<table style="width:100%; border-collapse:collapse; margin-bottom:15px;">' +
+                '<tr style="background:#ebf5fb;"><th>تاریخ</th><th>لیتر</th><th>مبلغ</th></tr>';
+            customer.sales.slice().reverse().forEach(function(s) {
+                html += '<tr style="border-bottom:1px solid #eee;">' +
+                    '<td>' + new Date(s.date).toLocaleString('fa-IR') + '</td>' +
+                    '<td>' + s.liters.toLocaleString() + '</td>' +
+                    '<td>' + s.totalAmount.toLocaleString() + '</td></tr>';
+            });
+            html += '</table>';
+        }
+
+        html += '<h4>پرداخت‌ها:</h4>';
+        if (customer.payments.length === 0) {
+            html += '<p style="color:#7f8c8d;">بدون پرداخت</p>';
+        } else {
+            html += '<table style="width:100%; border-collapse:collapse; margin-bottom:15px;">' +
+                '<tr style="background:#ebf5fb;"><th>تاریخ</th><th>شرح</th><th>مبلغ</th></tr>';
+            customer.payments.slice().reverse().forEach(function(p) {
+                html += '<tr style="border-bottom:1px solid #eee;">' +
+                    '<td>' + new Date(p.date).toLocaleString('fa-IR') + '</td>' +
+                    '<td>' + (p.note || '---') + '</td>' +
+                    '<td>' + p.amount.toLocaleString() + '</td></tr>';
+            });
+            html += '</table>';
+        }
+
+        var balanceColor = balance >= 0 ? '#c0392b' : '#27ae60'; // اگر بدهکار باشد قرمز، اگر بستانکار باشد سبز
+        var statusText = balance >= 0 ? 'بدهکار است' : 'بستانکار است';
+        html += '<div style="text-align:center; font-size:18px; font-weight:bold; margin:20px 0; padding:15px; background:#f4f9ff; border-radius:12px;">' +
+            'مانده حساب: <span style="color:' + balanceColor + '; font-size:20px;">' + Math.abs(balance).toLocaleString() + ' تومان</span>' +
+            '<br><small>(' + statusText + ')</small></div>';
+        html += '<button class="action-btn" onclick="closeModal()">بستن</button>';
+
+        modalContent.innerHTML = html;
+        modalOverlay.classList.add('active');
+    }
+
+    // =============================================
+    // توابع کمکی
+    // =============================================
+    function closeModal() {
+        document.getElementById('modal-overlay').classList.remove('active');
+    }
+
+    function getCurrentDateTimeLocal() {
+        var now = new Date();
+        return now.getFullYear() + '-' + 
+               String(now.getMonth() + 1).padStart(2, '0') + '-' + 
+               String(now.getDate()).padStart(2, '0') + 'T' + 
+               String(now.getHours()).padStart(2, '0') + ':' + 
+               String(now.getMinutes()).padStart(2, '0');
+    }
+
+    document.getElementById('modal-overlay').addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
+    });
+
+    console.log('اپلیکیشن کامل بارگذاری شد. تأمین‌کنندگان و مشتریان آماده استفاده هستند.');
+// =============================================
+// پشتیبان‌گیری و بازیابی
+// =============================================
+		// به‌روزرسانی اولیه
+updateDashboardSummary();
+function exportAllData() {
+    var allData = {
+        suppliers: getData(SUPPLIERS_KEY),
+        customers: getData(CUSTOMERS_KEY),
+        exportDate: new Date().toISOString()
+    };
+
+    var jsonString = JSON.stringify(allData, null, 2);
+    var blob = new Blob([jsonString], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'water-backup-' + new Date().toLocaleDateString('fa-IR').replace(/\//g, '-') + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    alert('✅ فایل پشتیبان با موفقیت ذخیره شد. آن را در پوشه Downloads گوشی پیدا کنید.');
+}
+
+function importAllData(event) {
+    var file = event.target.files[0];
+    if (!file) return;
+
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            var importedData = JSON.parse(e.target.result);
+
+            if (importedData.suppliers && importedData.customers) {
+                if (!confirm('⚠️ با این کار اطلاعات فعلی با فایل پشتیبان جایگزین می‌شود. ادامه می‌دهید؟')) {
+                    event.target.value = ''; // ریست input
+                    return;
+                }
+                saveData(SUPPLIERS_KEY, importedData.suppliers);
+                saveData(CUSTOMERS_KEY, importedData.customers);
+                alert('✅ اطلاعات با موفقیت بازیابی شد. صفحه را دوباره بارگذاری کنید.');
+                location.reload();
+            } else {
+                alert('❌ فایل پشتیبان معتبر نیست.');
+            }
+        } catch (error) {
+            alert('❌ خطا در خواندن فایل.');
+        }
+        event.target.value = ''; // ریست
+    };
+    reader.readAsText(file);
+}
+	// =============================================
+// نمایش خلاصه حساب‌ها در صفحه اصلی
+// =============================================
+function updateDashboardSummary() {
+    // محاسبه بدهی مشتریان (مجموع بدهکاری‌ها)
+    var customers = getData(CUSTOMERS_KEY);
+    var totalCustomerDebit = 0;
+    customers.forEach(function(c) {
+        var totalSales = c.sales.reduce(function(sum, s) { return sum + s.totalAmount; }, 0);
+        var totalPayments = c.payments.reduce(function(sum, p) { return sum + p.amount; }, 0);
+        var balance = totalSales - totalPayments;
+        if (balance > 0) totalCustomerDebit += balance;
+    });
+
+    // محاسبه بدهی به تأمین‌کنندگان (مجموع بستانکاری‌ها)
+    var suppliers = getData(SUPPLIERS_KEY);
+    var totalSupplierCredit = 0;
+    suppliers.forEach(function(s) {
+        var totalShipments = s.shipments.reduce(function(sum, sh) { return sum + sh.totalAmount; }, 0);
+        var totalPayments = s.payments.reduce(function(sum, p) { return sum + p.amount; }, 0);
+        var balance = totalShipments - totalPayments;
+        if (balance > 0) totalSupplierCredit += balance;
+    });
+
+    // نمایش در صفحه اصلی
+    document.getElementById('total-customer-debit').textContent = totalCustomerDebit.toLocaleString() + ' تومان';
+    document.getElementById('total-supplier-credit').textContent = totalSupplierCredit.toLocaleString() + ' تومان';
+}
+	</script>
+</body>
+</html>
